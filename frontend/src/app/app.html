@@ -1,0 +1,19 @@
+
+<nav class="navbar">
+  <div class="nav-container">
+    <a class="navbar-brand" routerLink="/">
+      <span class="brand-text">Reservi</span>
+    </a>
+    <div class="nav-links">
+      @if (isLoggedIn()) {
+        <button class="btn-logout" (click)="logout()">Déconnexion</button>
+      } @else {
+        <button class="btn-login" routerLink="/login">Connexion</button>
+      }
+    </div>
+  </div>
+</nav>
+
+<main class="main-content">
+  <router-outlet></router-outlet>
+</main>

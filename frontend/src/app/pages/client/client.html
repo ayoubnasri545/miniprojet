@@ -1,0 +1,180 @@
+<div class="client-container">
+ 
+  <div class="client-header">
+    <div class="header-content">
+      <div class="etablissement-badge">
+        <img [src]="etablissementImage" [alt]="etablissementNom" class="etablissement-logo">
+        <div class="badge-info">
+          <span class="etablissement-name">{{ etablissementNom }}</span>
+          <span class="lieu-badge">📍 {{ lieuNom }}</span>
+        </div>
+      </div>
+      <div class="welcome-box">
+        <h1 class="welcome-title">🎉 Bienvenue !</h1>
+        <p class="welcome-subtitle">Prenez un ticket et suivez votre file d'attente</p>
+      </div>
+    </div>
+  </div>
+  
+ 
+  <div class="services-section">
+    <h2 class="section-title">
+      <span class="title-icon">🚀</span>
+      Choisissez votre service
+    </h2>
+    <div class="services-grid">
+      @for (service of services; track service.id) {
+        <div class="service-card" (click)="prendreTicket(service.id)">
+          <div class="card-front">
+            <div class="service-icon">{{ getServiceIcon(service.id) }}</div>
+            <h3>{{ service.nom }}</h3>
+            <p>Cliquez pour prendre un ticket</p>
+            <button class="btn-ticket">Prendre ticket →</button>
+          </div>
+          <div class="card-back">
+            <div class="waiting-time">
+              <span class="clock">⏱️</span>
+              <span>Temps d'attente estimé: ~{{ getEstimatedWaitTime(service.id) }} min</span>
+            </div>
+          </div>
+        </div>
+      }
+      @empty {
+        <div class="empty-state">
+          <div class="empty-icon">🤔</div>
+          <p>Aucun service disponible</p>
+        </div>
+      }
+    </div>
+  </div>
+  
+ 
+  @if (lastTicket) {
+    <div class="ticket-notification" (click)="closeNotification()">
+      <div class="notification-content">
+        <div class="notification-icon">🎟️</div>
+        <div class="notification-info">
+          <h3>Ticket #{{
+            lastTicket.numero
+          }} créé avec succès !</h3>
+          <p>Votre numéro est le <strong>{{ lastTicket.numero }}</strong> pour le service <strong>{{ getServiceName(lastTicket.service_id) }}</strong></p>
+          <p class="notification-advice">📢 Restez à l'écoute, vous serez appelé prochainement !</p>
+        </div>
+        <button class="notification-close">✖</button>
+      </div>
+    </div>
+  }
+  
+ 
+  <div class="tickets-section">
+    <div class="section-header">
+      <h2 class="section-title">
+        <span class="title-icon">📋</span>
+        Historique de vos tickets
+      </h2>
+      <button class="refresh-btn" (click)="loadMyTickets()">
+        🔄 Actualiser
+      </button>
+    </div>
+    
+    <div class="tickets-table-wrapper">
+      @if (loading) {
+        <div class="loading-spinner">
+          <div class="spinner"></div>
+          <p>Chargement de vos tickets...</p>
+        </div>
+      } @else if (myTickets.length === 0) {
+        <div class="empty-tickets">
+          <div class="empty-icon">🎫</div>
+          <h3>Aucun ticket pour le moment</h3>
+          <p>Prenez votre premier ticket en cliquant sur un service ci-dessus !</p>
+        </div>
+      } @else {
+        <table class="tickets-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Numéro ticket</th>
+              <th>Service</th>
+              <th>Date de création</th>
+              <th>Guichet</th>
+              <th>Statut</th>
+              <th>Temps d'attente</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (ticket of myTickets; track ticket.id; let i = $index) {
+              <tr [class]="getStatusClass(ticket.status)">
+                <td class="ticket-id">{{ i + 1 }}</td>
+                <td class="ticket-number">
+                  <span class="number-badge">{{ ticket.numero }}</span>
+                </td>
+                <td>
+                  <span class="service-badge">{{ getServiceName(ticket.service_id) }}</span>
+                </td>
+                <td>
+                  <span class="date-badge">{{ ticket.created_at | date:'dd/MM/yyyy HH:mm' }}</span>
+                </td>
+                <td>
+                  @if (ticket.guichet_id) {
+                    <span class="guichet-badge">Guichet N°{{ ticket.guichet_id }}</span>
+                  } @else {
+                    <span class="waiting-badge">En attente</span>
+                  }
+                </td>
+                <td>
+                  <span class="status-badge" [ngClass]="ticket.status">
+                    @if (ticket.status === 'waiting') {
+                      ⏳ En attente
+                    } @else if (ticket.status === 'processing') {
+                      🔄 En cours
+                    } @else if (ticket.status === 'done') {
+                      ✅ Terminé
+                    } @else {
+                      ❓ Inconnu
+                    }
+                  </span>
+                </td>
+                <td>
+                  <span class="wait-time">{{ getWaitTime(ticket.created_at) }}</span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+        
+        
+        <div class="tickets-summary">
+          <div class="summary-card">
+            <div class="summary-icon">📊</div>
+            <div class="summary-info">
+              <h4>Total tickets</h4>
+              <p class="summary-value">{{ myTickets.length }}</p>
+            </div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-icon">⏳</div>
+            <div class="summary-info">
+              <h4>En attente</h4>
+              <p class="summary-value waiting-count">{{ getWaitingCount() }}</p>
+            </div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-icon">🔄</div>
+            <div class="summary-info">
+              <h4>En cours</h4>
+              <p class="summary-value processing-count">{{ getProcessingCount() }}</p>
+            </div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-icon">✅</div>
+            <div class="summary-info">
+              <h4>Terminés</h4>
+              <p class="summary-value done-count">{{ getDoneCount() }}</p>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

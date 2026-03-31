@@ -1,0 +1,35 @@
+<div class="guichet-container">
+  <div class="guichet-header">
+    <div class="etablissement-badge">
+      <img [src]="etablissementImage" [alt]="etablissementNom" class="etablissement-mini-logo">
+      
+      <span class="lieu-badge">📍 {{ lieuNom }}</span>
+    </div>
+    <h2>🏪 Guichet</h2>
+    <p>Gestion des tickets pour votre service</p>
+  </div>
+  
+  <div class="service-info-card">
+    <div class="service-icon-big">🎫</div>
+    <div class="service-details">
+      <h3>Votre service</h3>
+      <div class="service-name">{{ serviceName }}</div>
+    </div>
+  </div>
+  
+  <div class="current-ticket">
+    <div class="current-label">Ticket actuel</div>
+    <div class="current-number">{{ current ? current.numero : '---' }}</div>
+    @if (current) {
+      <div class="current-status">En cours de traitement</div>
+    }
+  </div>
+  
+  <button class="btn-next" (click)="next()" [disabled]="loading">
+    {{ loading ? 'Chargement...' : 'Appeler le prochain client →' }}
+  </button>
+  
+  @if (message) {
+    <div class="info-message">{{ message }}</div>
+  }
+</div>

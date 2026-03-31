@@ -1,0 +1,154 @@
+<div class="admin-container">
+  <div class="sidebar">
+    <div class="logo">
+      <h2>📋Admin</h2>
+    </div>
+    
+    <div class="nav-menu">
+      <button class="nav-item" [class.active]="activeTab === 'users'" (click)="activeTab = 'users'">
+        👥 Employés
+      </button>
+      <button class="nav-item" [class.active]="activeTab === 'services'" (click)="activeTab = 'services'">
+        🏷️ Services
+      </button>
+    </div>
+    
+    <button class="logout-btn" (click)="logout()">
+      🚪 Déconnexion
+    </button>
+  </div>
+  
+  <div class="main-content">
+    <div class="header">
+      <h1 align="center">BIENVENUE</h1>
+      <p></p>
+    </div>
+    
+   
+    @if (activeTab === 'users') {
+      <div class="section">
+        <div class="section-header">
+          <h2>👥 Employés</h2>
+          <button class="btn-add" (click)="showAddUser = !showAddUser">
+            {{ showAddUser ? '✖ Fermer' : '+ Ajouter' }}
+          </button>
+        </div>
+        
+
+        @if (showAddUser) {
+          <div class="form-card">
+            <h3>Ajouter un employé</h3>
+            <div class="form-grid">
+              <input type="text" [(ngModel)]="newUser.nom" placeholder="Nom">
+              <input type="text" [(ngModel)]="newUser.prenom" placeholder="Prénom">
+              <select [(ngModel)]="newUser.service">
+                <option value="1">Admin</option>
+                <option value="2">Guichet</option>
+                <option value="3">Client</option>
+              </select>
+              <input type="text" [(ngModel)]="newUser.username" placeholder="Nom utilisateur">
+              <input type="password" [(ngModel)]="newUser.password" placeholder="Mot de passe">
+            </div>
+            <button class="btn-save" (click)="addUser()">Enregistrer</button>
+          </div>
+        }
+        
+       
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nom</th>
+              <th>Prénom</th>
+              <th>Rôle</th>
+              <th>Username</th>
+              <th>Action</th>
+            </thead>
+          <tbody>
+            @for (user of users; track user.id) {
+              <tr>
+                <td>{{ user.id }}</td>
+                <td>{{ user.nom }}</td>
+                <td>{{ user.prenom }}</td>
+                <td>{{ user.service === 1 ? 'Admin' : user.service === 2 ? 'Guichet' : 'Client' }}</td>
+                <td>{{ user.username }}</td>
+                <td>
+                  <button class="btn-delete" (click)="deleteUser(user.id)">🗑️ Supprimer</button>
+                </td>
+              </tr>
+            }
+            @empty {
+              <tr><td colspan="6" style="text-align:center">Aucun employé</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+    
+
+    @if (activeTab === 'services') {
+      <div class="section">
+        <div class="section-header">
+          <h2>🏷️ Services</h2>
+          <button class="btn-add" (click)="showAddService = !showAddService">
+            {{ showAddService ? '✖ Fermer' : '+ Ajouter' }}
+          </button>
+        </div>
+      ""
+        @if (showAddService) {
+          <div class="form-card">
+            <h3>Ajouter un service</h3>
+            <div class="form-grid">
+              <input type="text" [(ngModel)]="newService.nom" placeholder="Nom du service">
+              <select [(ngModel)]="newService.guichet_id">
+                <option value="">-- Choisir un guichet --</option>
+                @for (guichet of guichets; track guichet.id) {
+                  <option [value]="guichet.id">Guichet N°{{ guichet.numero }}</option>
+                }
+              </select>
+              <select [(ngModel)]="newService.employe_id">
+                <option value="">-- Choisir un employé --</option>
+                @for (employe of employes; track employe.id) {
+                  <option [value]="employe.id">{{ employe.nom }} {{ employe.prenom }}</option>
+                }
+              </select>
+            </div>
+            <button class="btn-save" (click)="addService()">Enregistrer</button>
+          </div>
+        }
+        
+        <table class="data-table">
+          <thead>
+             <tr>
+              <th>ID</th>
+              <th>Service</th>
+              <th>Guichet</th>
+              <th>Employé</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (service of services; track service.id) {
+              <tr>
+                <td>{{ service.id }}</td>
+                <td>{{ service.nom }}</td>
+                <td>{{ service.guichet_numero ? 'Guichet N°' + service.guichet_numero : '-' }}</td>
+                <td>{{ service.employe_nom ? service.employe_nom + ' ' + service.employe_prenom : '-' }}</td>
+                <td>
+                  <button class="btn-delete" (click)="deleteService(service.id)">🗑️ Supprimer</button>
+                </td>
+              </tr>
+            }
+            @empty {
+              <tr><td colspan="5" style="text-align:center">Aucun service</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+    
+    @if (message) {
+      <div class="message">{{ message }}</div>
+    }
+  </div>
+</div>
